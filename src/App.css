@@ -29,16 +29,37 @@ h1 {
   letter-spacing: -0.5px;
 }
 
-.status-card {
-  padding: 5rem 4rem;
-  border-radius: 20px;
+.servers-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 3rem;
   margin-bottom: 3rem;
+}
+
+.server-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.server-title {
+  color: #ffffff;
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.status-card {
+  padding: 4rem 3rem;
+  border-radius: 20px;
+  margin-bottom: 2rem;
   animation: fadeIn 0.5s ease-in;
-  min-height: 350px;
+  min-height: 300px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  flex: 1;
 }
 
 .status-card.loading {
@@ -53,6 +74,11 @@ h1 {
 
 .status-card.offline {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.status-card.coming-soon {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
   color: white;
 }
 
@@ -81,6 +107,11 @@ h1 {
   box-shadow: 0 0 40px rgba(255, 255, 255, 0.9);
 }
 
+.dot.coming-soon {
+  background: #fbbf24;
+  box-shadow: 0 0 40px rgba(251, 191, 36, 0.9);
+}
+
 .spinner {
   width: 48px;
   height: 48px;
@@ -95,6 +126,19 @@ h1 {
   font-size: 4rem;
   font-weight: 700;
   letter-spacing: 3px;
+}
+
+.status-card h3 {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.coming-soon-text {
+  margin-top: 1.5rem;
+  font-size: 1.3rem;
+  opacity: 0.9;
 }
 
 .response-time,
@@ -177,13 +221,22 @@ h1 {
     font-size: 3rem;
   }
 
-  .status-card {
-    padding: 3.5rem 3rem;
-    min-height: 280px;
+  .servers-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
   }
 
-  .status-card h2 {
-    font-size: 3rem;
+  .server-title {
+    font-size: 1.75rem;
+  }
+
+  .status-card {
+    padding: 3rem 2.5rem;
+    min-height: 250px;
+  }
+
+  .status-card h3 {
+    font-size: 2rem;
   }
 
   .dot,
@@ -194,12 +247,16 @@ h1 {
 
   .response-time,
   .last-checked {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
   }
 
   .refresh-button {
     padding: 1.25rem 3rem;
     font-size: 1.2rem;
+  }
+
+  .coming-soon-text {
+    font-size: 1.1rem;
   }
 }
 
@@ -218,13 +275,23 @@ h1 {
     margin-bottom: 2rem;
   }
 
-  .status-card {
-    padding: 2.5rem 2rem;
-    min-height: 200px;
+  .servers-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
   }
 
-  .status-card h2 {
-    font-size: 2rem;
+  .server-title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .status-card {
+    padding: 2.5rem 2rem;
+    min-height: 180px;
+  }
+
+  .status-card h3 {
+    font-size: 1.5rem;
     letter-spacing: 1px;
   }
 
@@ -240,12 +307,16 @@ h1 {
 
   .response-time,
   .last-checked {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   .refresh-button {
     padding: 1rem 2rem;
     font-size: 1rem;
+  }
+
+  .coming-soon-text {
+    font-size: 0.95rem;
   }
 }
 
@@ -253,7 +324,7 @@ h1 {
 @media (min-width: 1440px) {
   .container {
     width: 85%;
-    max-width: 1600px;
+    max-width: 1800px;
     padding: 6rem 8rem;
   }
 
@@ -262,13 +333,22 @@ h1 {
     margin-bottom: 5rem;
   }
 
-  .status-card {
-    padding: 6rem 5rem;
-    min-height: 400px;
+  .servers-grid {
+    gap: 4rem;
   }
 
-  .status-card h2 {
-    font-size: 5rem;
+  .server-title {
+    font-size: 2.5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .status-card {
+    padding: 5rem 4rem;
+    min-height: 350px;
+  }
+
+  .status-card h3 {
+    font-size: 3rem;
   }
 
   .dot,
@@ -279,7 +359,7 @@ h1 {
 
   .response-time,
   .last-checked {
-    font-size: 1.75rem;
+    font-size: 1.6rem;
   }
 
   .refresh-button {
@@ -289,5 +369,9 @@ h1 {
 
   .auto-refresh-note {
     font-size: 1.3rem;
+  }
+
+  .coming-soon-text {
+    font-size: 1.5rem;
   }
 }

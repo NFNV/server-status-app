@@ -2,21 +2,21 @@ import { useState, useEffect, useCallback } from 'react'
 import './App.css'
 
 function App() {
-  const serverUrl = 'http://34.39.183.45:5121'
-  const [status, setStatus] = useState('loading')
-  const [responseTime, setResponseTime] = useState(null)
-  const [lastChecked, setLastChecked] = useState(null)
+  const nwnServerUrl = 'http://34.39.183.45:5121'
+  const [nwnStatus, setNwnStatus] = useState('loading')
+  const [nwnResponseTime, setNwnResponseTime] = useState(null)
+  const [nwnLastChecked, setNwnLastChecked] = useState(null)
 
-  const checkServerStatus = useCallback(async () => {
-    setStatus('loading')
-    setResponseTime(null)
+  const checkNwnServerStatus = useCallback(async () => {
+    setNwnStatus('loading')
+    setNwnResponseTime(null)
     const startTime = performance.now()
 
     const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Timeout')), 10000) // 10 second timeout
+      setTimeout(() => reject(new Error('Timeout')), 10000)
     })
 
-    const fetchPromise = fetch(serverUrl, {
+    const fetchPromise = fetch(nwnServerUrl, {
       method: 'HEAD',
       mode: 'no-cors',
       cache: 'no-cache',
@@ -28,74 +28,100 @@ function App() {
       const endTime = performance.now()
       const timeTaken = Math.round(endTime - startTime)
 
-      setStatus('online')
-      setResponseTime(timeTaken)
-      setLastChecked(new Date())
+      setNwnStatus('online')
+      setNwnResponseTime(timeTaken)
+      setNwnLastChecked(new Date())
     } catch (error) {
-      setStatus('offline')
-      setResponseTime(null)
-      setLastChecked(new Date())
+      setNwnStatus('offline')
+      setNwnResponseTime(null)
+      setNwnLastChecked(new Date())
     }
-  }, [serverUrl])
+  }, [nwnServerUrl])
 
   useEffect(() => {
-    checkServerStatus()
+    checkNwnServerStatus()
 
     const interval = setInterval(() => {
-      checkServerStatus()
+      checkNwnServerStatus()
     }, 30000)
 
     return () => clearInterval(interval)
-  }, [checkServerStatus])
+  }, [checkNwnServerStatus])
 
   return (
     <div className="app">
       <div className="container">
-        <h1>Server Status</h1>
+        <h1>Gaming Servers Status</h1>
 
-        {status === 'loading' && (
-          <div className="status-card loading">
-            <div className="status-indicator">
-              <div className="spinner"></div>
-              <h2>Checking Server...</h2>
-            </div>
-          </div>
-        )}
+        <div className="servers-grid">
+          {/* Neverwinter Nights Server */}
+          <div className="server-box">
+            <h2 className="server-title">Neverwinter Nights</h2>
 
-        {status === 'online' && (
-          <div className="status-card online">
-            <div className="status-indicator">
-              <span className="dot online"></span>
-              <h2>ONLINE</h2>
-            </div>
-            {responseTime && (
-              <p className="response-time">Response time: {responseTime}ms</p>
+            {nwnStatus === 'loading' && (
+              <div className="status-card loading">
+                <div className="status-indicator">
+                  <div className="spinner"></div>
+                  <h3>Checking...</h3>
+                </div>
+              </div>
             )}
-            {lastChecked && (
-              <p className="last-checked">
-                Last checked: {lastChecked.toLocaleTimeString()}
+
+            {nwnStatus === 'online' && (
+              <div className="status-card online">
+                <div className="status-indicator">
+                  <span className="dot online"></span>
+                  <h3>ONLINE</h3>
+                </div>
+                {nwnResponseTime && (
+                  <p className="response-time">{nwnResponseTime}ms</p>
+                )}
+                {nwnLastChecked && (
+                  <p className="last-checked">
+                    {nwnLastChecked.toLocaleTimeString()}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {nwnStatus === 'offline' && (
+              <div className="status-card offline">
+                <div className="status-indicator">
+                  <span className="dot offline"></span>
+                  <h3>OFFLINE</h3>
+                </div>
+                {nwnLastChecked && (
+                  <p className="last-checked">
+                    {nwnLastChecked.toLocaleTimeString()}
+                  </p>
+                )}
+              </div>
+            )}
+
+            <button onClick={checkNwnServerStatus} className="refresh-button">
+              Check Again
+            </button>
+          </div>
+
+          {/* Ryzom Server - Coming Soon */}
+          <div className="server-box">
+            <h2 className="server-title">Ryzom</h2>
+
+            <div className="status-card coming-soon">
+              <div className="status-indicator">
+                <span className="dot coming-soon"></span>
+                <h3>COMING SOON</h3>
+              </div>
+              <p className="coming-soon-text">
+                Server launching soon
               </p>
-            )}
-          </div>
-        )}
-
-        {status === 'offline' && (
-          <div className="status-card offline">
-            <div className="status-indicator">
-              <span className="dot offline"></span>
-              <h2>OFFLINE</h2>
             </div>
-            {lastChecked && (
-              <p className="last-checked">
-                Last checked: {lastChecked.toLocaleTimeString()}
-              </p>
-            )}
-          </div>
-        )}
 
-        <button onClick={checkServerStatus} className="refresh-button">
-          Check Again
-        </button>
+            <button className="refresh-button" disabled>
+              Not Available
+            </button>
+          </div>
+        </div>
 
         <p className="auto-refresh-note">
           Auto-refreshing every 30 seconds
