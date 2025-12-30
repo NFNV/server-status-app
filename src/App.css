@@ -479,16 +479,22 @@ h1::after {
   .status-card h3 {
     font-size: 1.5rem;
     letter-spacing: 1px;
+    min-width: 0;
+    text-align: center;
   }
 
   .status-indicator {
     gap: 1rem;
+    max-width: 100%;
+    flex-direction: column;
   }
 
   .dot,
   .spinner {
     width: 24px;
     height: 24px;
+    min-width: 24px;
+    min-height: 24px;
   }
 
   .response-time,
