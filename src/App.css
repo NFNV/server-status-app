@@ -218,25 +218,29 @@ h1::after {
 }
 
 .dot {
+  display: block;
   width: 48px;
   height: 48px;
+  min-width: 48px;
+  min-height: 48px;
   border-radius: 50%;
   animation: pulse 2s infinite;
+  flex-shrink: 0;
 }
 
 .dot.online {
   background: #ffffff;
-  box-shadow: 0 0 40px rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
 }
 
 .dot.offline {
   background: #ffffff;
-  box-shadow: 0 0 40px rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
 }
 
 .dot.coming-soon {
-  background: #f5d9b8;
-  box-shadow: 0 0 40px rgba(245, 217, 184, 0.8);
+  background: #ffffff;
+  box-shadow: 0 0 30px rgba(212, 165, 116, 0.8);
 }
 
 .spinner {
