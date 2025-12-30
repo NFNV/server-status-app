@@ -1,0 +1,293 @@
+.app {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+  padding: 2rem;
+}
+
+.container {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 4rem 6rem;
+  width: 90%;
+  max-width: 1400px;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
+  text-align: center;
+  margin: 0 auto;
+}
+
+h1 {
+  color: #ffffff;
+  margin-bottom: 4rem;
+  font-size: 4rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.status-card {
+  padding: 5rem 4rem;
+  border-radius: 20px;
+  margin-bottom: 3rem;
+  animation: fadeIn 0.5s ease-in;
+  min-height: 350px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-card.loading {
+  background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+  color: white;
+}
+
+.status-card.online {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.status-card.offline {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.dot {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.dot.online {
+  background: #ffffff;
+  box-shadow: 0 0 40px rgba(255, 255, 255, 0.9);
+}
+
+.dot.offline {
+  background: #ffffff;
+  box-shadow: 0 0 40px rgba(255, 255, 255, 0.9);
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 5px solid rgba(255, 255, 255, 0.3);
+  border-top: 5px solid #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.status-card h2 {
+  margin: 0;
+  font-size: 4rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+}
+
+.response-time,
+.last-checked {
+  margin: 1rem 0;
+  opacity: 0.95;
+  font-size: 1.5rem;
+}
+
+.refresh-button {
+  padding: 1.5rem 4rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  backdrop-filter: blur(10px);
+}
+
+.refresh-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.refresh-button:active {
+  transform: translateY(0);
+}
+
+.auto-refresh-note {
+  margin-top: 2.5rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.2rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.85;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Tablet and below */
+@media (max-width: 1024px) {
+  .container {
+    padding: 3rem 4rem;
+    width: 85%;
+    max-width: 800px;
+  }
+
+  h1 {
+    font-size: 3rem;
+  }
+
+  .status-card {
+    padding: 3.5rem 3rem;
+    min-height: 280px;
+  }
+
+  .status-card h2 {
+    font-size: 3rem;
+  }
+
+  .dot,
+  .spinner {
+    width: 40px;
+    height: 40px;
+  }
+
+  .response-time,
+  .last-checked {
+    font-size: 1.3rem;
+  }
+
+  .refresh-button {
+    padding: 1.25rem 3rem;
+    font-size: 1.2rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .app {
+    padding: 1rem;
+  }
+
+  .container {
+    padding: 2rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .status-card {
+    padding: 2.5rem 2rem;
+    min-height: 200px;
+  }
+
+  .status-card h2 {
+    font-size: 2rem;
+    letter-spacing: 1px;
+  }
+
+  .status-indicator {
+    gap: 1rem;
+  }
+
+  .dot,
+  .spinner {
+    width: 24px;
+    height: 24px;
+  }
+
+  .response-time,
+  .last-checked {
+    font-size: 1rem;
+  }
+
+  .refresh-button {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+  }
+}
+
+/* Large desktop */
+@media (min-width: 1440px) {
+  .container {
+    width: 85%;
+    max-width: 1600px;
+    padding: 6rem 8rem;
+  }
+
+  h1 {
+    font-size: 5rem;
+    margin-bottom: 5rem;
+  }
+
+  .status-card {
+    padding: 6rem 5rem;
+    min-height: 400px;
+  }
+
+  .status-card h2 {
+    font-size: 5rem;
+  }
+
+  .dot,
+  .spinner {
+    width: 56px;
+    height: 56px;
+  }
+
+  .response-time,
+  .last-checked {
+    font-size: 1.75rem;
+  }
+
+  .refresh-button {
+    padding: 1.75rem 5rem;
+    font-size: 1.4rem;
+  }
+
+  .auto-refresh-note {
+    font-size: 1.3rem;
+  }
+}
