@@ -52,14 +52,16 @@ Game servers like Neverwinter Nights communicate primarily over **UDP**, but web
 
 2. **Two-Tier Status Check**
    - **Primary**: GameDig query using GameSpy2 protocol over UDP
-   - **Fallback**: TCP connection check on port 5121
+   - **Fallback**: UDP probe with ICMP error detection
 
-3. **Why the Fallback?**
-   - NWN:EE servers don't always respond to GameSpy queries
-   - The server also listens on TCP port 5121
-   - TCP is connection-oriented: connection succeeds = server up, refused = server down
+3. **How the UDP Probe Works**
+   - NWN:EE servers don't respond to GameSpy queries
+   - NWN only listens on **UDP** (not TCP)
+   - We send a UDP probe packet to port 5121
+   - If the OS returns ICMP "port unreachable" → Server is **offline**
+   - If no ICMP error is received → Server is **online** (listening)
 
-This hybrid approach ensures accurate online/offline detection even when full query protocols aren't available.
+This hybrid approach ensures accurate online/offline detection for UDP-only game servers, even when standard query protocols aren't available.
 
 ## Getting Started
 
