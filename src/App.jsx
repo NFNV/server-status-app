@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react'
 import './App.css'
 
 function App() {
-  const nwnServerUrl = 'http://34.39.183.45:5121'
   const [nwnStatus, setNwnStatus] = useState('loading')
   const [nwnResponseTime, setNwnResponseTime] = useState(null)
   const [nwnLastChecked, setNwnLastChecked] = useState(null)
@@ -12,31 +11,37 @@ function App() {
     setNwnResponseTime(null)
     const startTime = performance.now()
 
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Timeout')), 10000)
-    })
-
-    const fetchPromise = fetch(nwnServerUrl, {
-      method: 'HEAD',
-      mode: 'no-cors',
-      cache: 'no-cache',
-    })
-
     try {
-      await Promise.race([fetchPromise, timeoutPromise])
+      const response = await fetch('/api/server-status', {
+        method: 'GET',
+        cache: 'no-cache',
+      })
 
       const endTime = performance.now()
       const timeTaken = Math.round(endTime - startTime)
 
-      setNwnStatus('online')
-      setNwnResponseTime(timeTaken)
+      if (!response.ok) {
+        throw new Error('API request failed')
+      }
+
+      const data = await response.json()
+
+      if (data.online) {
+        setNwnStatus('online')
+        setNwnResponseTime(timeTaken)
+      } else {
+        setNwnStatus('offline')
+        setNwnResponseTime(null)
+      }
+
       setNwnLastChecked(new Date())
     } catch (error) {
+      console.error('Server status check failed:', error)
       setNwnStatus('offline')
       setNwnResponseTime(null)
       setNwnLastChecked(new Date())
     }
-  }, [nwnServerUrl])
+  }, [])
 
   useEffect(() => {
     checkNwnServerStatus()

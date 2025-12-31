@@ -34,6 +34,32 @@ The interface employs a "Technical Refinement" aesthetic with:
 - **Vite** - Build tool and dev server
 - **CSS3** - Advanced styling with animations and gradients
 - **Google Fonts** - JetBrains Mono and Inter typefaces
+- **GameDig** - Game server query library
+- **Express** - Local development API server
+- **Node.js net module** - TCP connection fallback
+
+## Technical Implementation
+
+### The UDP Challenge
+
+Game servers like Neverwinter Nights communicate primarily over **UDP**, but web browsers cannot make UDP requests due to security restrictions. This creates a challenge for web-based monitoring.
+
+**Solution Architecture:**
+
+1. **Backend API Layer** (`/api/server-status`)
+   - Runs as a Node.js serverless function (Vercel) or Express server (local dev)
+   - Has access to Node.js networking capabilities (UDP/TCP)
+
+2. **Two-Tier Status Check**
+   - **Primary**: GameDig query using GameSpy2 protocol over UDP
+   - **Fallback**: TCP connection check on port 5121
+
+3. **Why the Fallback?**
+   - NWN:EE servers don't always respond to GameSpy queries
+   - The server also listens on TCP port 5121
+   - TCP is connection-oriented: connection succeeds = server up, refused = server down
+
+This hybrid approach ensures accurate online/offline detection even when full query protocols aren't available.
 
 ## Getting Started
 
