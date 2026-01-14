@@ -1,4 +1,5 @@
 :root {
+  --app-width: 100%;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -12,18 +13,28 @@
 * {
   margin: 0;
   padding: 0;
+}
+
+*, *::before, *::after {
   box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 body {
   margin: 0;
   padding: 0;
-  min-width: 100vw;
-  min-height: 100vh;
-  overflow-x: hidden;
+  min-height: 100svh;
+  min-height: 100dvh;
 }
 
 #root {
   width: 100%;
-  min-height: 100vh;
+  max-width: 100%;
+  min-height: 100svh;
+  min-height: 100dvh;
 }

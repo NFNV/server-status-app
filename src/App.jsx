@@ -1,54 +1,109 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import './App.css'
+import { fetchServerStatus } from './api/statusApi'
 
 function App() {
+  // State for server status
   const [nwnStatus, setNwnStatus] = useState('loading')
   const [nwnResponseTime, setNwnResponseTime] = useState(null)
   const [nwnLastChecked, setNwnLastChecked] = useState(null)
+  const [nwnServerName, setNwnServerName] = useState(null)
+  const [nwnPlayers, setNwnPlayers] = useState(0)
+  const [nwnMaxPlayers, setNwnMaxPlayers] = useState(null)
+  const isCheckingRef = useRef(false)
+  const hasLoadedRef = useRef(false)
 
-  const checkNwnServerStatus = useCallback(async () => {
-    setNwnStatus('loading')
-    setNwnResponseTime(null)
-    const startTime = performance.now()
+  useEffect(() => {
+    const updateViewportWidth = () => {
+      const width = window.visualViewport?.width || window.innerWidth
+      document.documentElement.style.setProperty('--app-width', `${Math.round(width)}px`)
+    }
 
-    try {
-      const response = await fetch('/api/server-status', {
-        method: 'GET',
-        cache: 'no-cache',
-      })
+    const scheduleUpdate = () => {
+      requestAnimationFrame(updateViewportWidth)
+    }
 
-      const endTime = performance.now()
-      const timeTaken = Math.round(endTime - startTime)
+    updateViewportWidth()
 
-      if (!response.ok) {
-        throw new Error('API request failed')
+    window.addEventListener('resize', scheduleUpdate)
+    window.addEventListener('orientationchange', scheduleUpdate)
+
+    const visualViewport = window.visualViewport
+    if (visualViewport) {
+      visualViewport.addEventListener('resize', scheduleUpdate)
+      visualViewport.addEventListener('scroll', scheduleUpdate)
+    }
+
+    return () => {
+      window.removeEventListener('resize', scheduleUpdate)
+      window.removeEventListener('orientationchange', scheduleUpdate)
+      if (visualViewport) {
+        visualViewport.removeEventListener('resize', scheduleUpdate)
+        visualViewport.removeEventListener('scroll', scheduleUpdate)
       }
-
-      const data = await response.json()
-
-      if (data.online) {
-        setNwnStatus('online')
-        setNwnResponseTime(timeTaken)
-      } else {
-        setNwnStatus('offline')
-        setNwnResponseTime(null)
-      }
-
-      setNwnLastChecked(new Date())
-    } catch (error) {
-      console.error('Server status check failed:', error)
-      setNwnStatus('offline')
-      setNwnResponseTime(null)
-      setNwnLastChecked(new Date())
     }
   }, [])
 
-  useEffect(() => {
-    checkNwnServerStatus()
 
+  /**
+   * Check NWN server status by calling the backend API
+   * Refreshes every 15 seconds automatically
+   */
+  const checkNwnServerStatus = useCallback(async ({ forceLoading = false } = {}) => {
+    if (isCheckingRef.current) {
+      return
+    }
+
+    isCheckingRef.current = true
+
+    if (!hasLoadedRef.current || forceLoading) {
+      setNwnStatus('loading')
+    }
+
+    try {
+      // Fetch status from the VM backend API
+      const statusData = await fetchServerStatus()
+
+      // Update all state based on the response
+      if (statusData.online) {
+        setNwnStatus('online')
+        setNwnResponseTime(statusData.latencyMs)
+        setNwnServerName(statusData.name)
+        setNwnPlayers(statusData.players)
+        setNwnMaxPlayers(statusData.maxPlayers)
+      } else {
+        setNwnStatus('offline')
+        setNwnResponseTime(null)
+        setNwnServerName(statusData.name)
+        setNwnPlayers(statusData.players)
+        setNwnMaxPlayers(statusData.maxPlayers)
+      }
+
+      setNwnLastChecked(statusData.lastUpdated)
+      hasLoadedRef.current = true
+    } catch (error) {
+      // This should rarely happen since fetchServerStatus handles errors
+      console.error('Unexpected error checking server status:', error)
+      setNwnStatus('offline')
+      setNwnResponseTime(null)
+      setNwnServerName(null)
+      setNwnPlayers(0)
+      setNwnMaxPlayers(null)
+      setNwnLastChecked(new Date())
+      hasLoadedRef.current = true
+    } finally {
+      isCheckingRef.current = false
+    }
+  }, [])
+
+  // Initial check and polling interval
+  useEffect(() => {
+    checkNwnServerStatus({ forceLoading: true })
+
+    // Auto-refresh every 15 seconds
     const interval = setInterval(() => {
       checkNwnServerStatus()
-    }, 30000)
+    }, 15000)
 
     return () => clearInterval(interval)
   }, [checkNwnServerStatus])
@@ -78,6 +133,15 @@ function App() {
                   <span className="dot online"></span>
                   <h3>ONLINE</h3>
                 </div>
+                {nwnServerName && (
+                  <p className="response-time">{nwnServerName}</p>
+                )}
+                <p className="response-time">
+                  {nwnMaxPlayers !== null
+                    ? `${nwnPlayers} / ${nwnMaxPlayers} players`
+                    : `${nwnPlayers} player${nwnPlayers !== 1 ? 's' : ''}`
+                  }
+                </p>
                 {nwnResponseTime && (
                   <p className="response-time">{nwnResponseTime}ms</p>
                 )}
@@ -103,7 +167,10 @@ function App() {
               </div>
             )}
 
-            <button onClick={checkNwnServerStatus} className="refresh-button">
+            <button
+              onClick={() => checkNwnServerStatus({ forceLoading: true })}
+              className="refresh-button"
+            >
               Check Again
             </button>
           </div>
@@ -129,7 +196,7 @@ function App() {
         </div>
 
         <p className="auto-refresh-note">
-          Auto-refreshing every 30 seconds
+          Auto-refreshing every 15 seconds
         </p>
       </div>
     </div>
