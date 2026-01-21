@@ -59,9 +59,16 @@ Create a `.env` file in the project root (or copy `.env.example`):
 VITE_STATUS_API_BASE_URL=http://<VM_EXTERNAL_IP>:8080
 ```
 
+For local development, the Vite dev server proxies API requests to this URL when CORS blocks `http://localhost:5173`, so you can keep the VM IP here and still develop locally.
+
 For local development, you can point to localhost:
 ```bash
 VITE_STATUS_API_BASE_URL=http://127.0.0.1:8080
+```
+
+Dev note: the backend now reports container-truth from Docker (no UDP game server query). Example `.env`:
+```bash
+VITE_STATUS_API_BASE_URL=http://34.95.237.62:8080
 ```
 
 ### 2. Install Dependencies

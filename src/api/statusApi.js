@@ -8,24 +8,52 @@
 // Get the base URL from environment variables
 // In Vite, env vars are prefixed with VITE_ and accessed via import.meta.env
 const RAW_BASE_URL = import.meta.env.VITE_STATUS_API_BASE_URL || 'http://127.0.0.1:8080';
-const BASE_URL = normalizeBaseUrl(RAW_BASE_URL);
+const NORMALIZED_BASE_URL = normalizeBaseUrl(RAW_BASE_URL);
+// Use a dev proxy path when the backend doesn't allow localhost CORS.
+const DEV_PROXY_PATH = '/__status_api';
+const BASE_URL = shouldUseDevProxy(NORMALIZED_BASE_URL)
+  ? DEV_PROXY_PATH
+  : NORMALIZED_BASE_URL;
 
 function normalizeBaseUrl(url) {
   return url.replace(/\/+$/, '');
 }
 
+function shouldUseDevProxy(baseUrl) {
+  if (!import.meta.env.DEV || !baseUrl) {
+    return false;
+  }
+
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  if (baseUrl.startsWith('/')) {
+    return false;
+  }
+
+  try {
+    return new URL(baseUrl).origin !== window.location.origin;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Fetch server status from the backend API
  *
- * @returns {Promise<Object>} Normalized status object:
- *   - online: boolean - Whether the server is online
- *   - name: string | null - Server name
- *   - players: number - Current player count
- *   - maxPlayers: number | null - Maximum player capacity
- *   - lastUpdated: Date - Timestamp of this check
- *   - latencyMs: number | null - Response time for the status call
+ * @returns {Promise<Object>} Result with normalized status when successful:
+ *   - ok: boolean - True when the request succeeds
+ *   - data.online: boolean - Whether the server is online
+ *   - data.state: string - Container state (fallback "unknown")
+ *   - data.checkedAt: Date | null - Backend checked timestamp
+ *   - data.name: string | null - Server name
+ *   - data.players: number | null - Current player count
+ *   - data.maxPlayers: number | null - Maximum player capacity
+ *   - data.lastUpdated: Date - Timestamp of this check
+ *   - data.latencyMs: number | null - Response time for the status call
  *
- * If the backend is unreachable or returns an error, returns a safe "offline" object.
+ * If the backend is unreachable or returns an error, returns `{ ok: false, error, latencyMs }`.
  */
 export async function fetchServerStatus() {
   const startTime = performance.now();
@@ -50,22 +78,30 @@ export async function fetchServerStatus() {
     // Handle non-2xx responses
     if (!response.ok) {
       console.warn(`Status API returned ${response.status}: ${response.statusText}`);
-      return createOfflineStatus({ latencyMs });
+      return { ok: false, error: 'http', latencyMs };
     }
 
     const data = await response.json();
+    const checkedAt = parseCheckedAt(data.checked_at);
 
     // Normalize the response
     return {
-      online: Boolean(data.online),
-      name: data.name || null,
-      players: typeof data.players === 'number' ? data.players : 0,
-      maxPlayers: typeof data.max_players === 'number' ? data.max_players : null,
-      lastUpdated: new Date(),
-      latencyMs,
+      ok: true,
+      data: {
+        online: Boolean(data.online || data.server_running),
+        state: typeof data.container_state === 'string' && data.container_state.trim()
+          ? data.container_state
+          : 'unknown',
+        checkedAt,
+        name: data.name ?? null,
+        players: typeof data.players === 'number' ? data.players : null,
+        maxPlayers: typeof data.max_players === 'number' ? data.max_players : null,
+        lastUpdated: checkedAt || new Date(),
+        latencyMs,
+      },
     };
-
   } catch (error) {
+    const latencyMs = Math.round(performance.now() - startTime);
     // Handle network errors, timeouts, CORS issues, etc.
     if (error.name === 'AbortError') {
       console.warn('Status API request timed out');
@@ -75,24 +111,17 @@ export async function fetchServerStatus() {
       console.warn('Failed to fetch server status:', error.message);
     }
 
-    return createOfflineStatus();
+    return { ok: false, error: 'network', latencyMs };
   }
 }
 
-/**
- * Create a safe "offline" status object
- * Used when the backend is unreachable or returns an error
- */
-function createOfflineStatus(overrides = {}) {
-  return {
-    online: false,
-    name: null,
-    players: 0,
-    maxPlayers: null,
-    lastUpdated: new Date(),
-    latencyMs: null,
-    ...overrides,
-  };
+function parseCheckedAt(value) {
+  if (!value) {
+    return null;
+  }
+
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
 /**
