@@ -131,6 +131,7 @@ h1::after {
   gap: 3rem;
   margin-bottom: 3rem;
   min-width: 0;
+  align-items: end;
 }
 
 .server-box {
@@ -151,6 +152,8 @@ h1::after {
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   position: relative;
   padding-bottom: 0.75rem;
+  line-height: 1.2;
+  min-height: 4.2rem;
 }
 
 .server-title::after {
@@ -178,7 +181,6 @@ h1::after {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex: 1;
   border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow:
     0 10px 40px rgba(0, 0, 0, 0.3),
@@ -279,6 +281,9 @@ h1::after {
   font-weight: 700;
   letter-spacing: 2px;
   text-align: left;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
 }
 
 .coming-soon-text {
@@ -478,6 +483,7 @@ h1::after {
   .server-title {
     font-size: 1.5rem;
     margin-bottom: 1.5rem;
+    min-height: 3.6rem;
   }
 
   .status-card {
@@ -546,6 +552,7 @@ h1::after {
   .server-title {
     font-size: 2.5rem;
     margin-bottom: 2.5rem;
+    min-height: 6rem;
   }
 
   .status-card {
